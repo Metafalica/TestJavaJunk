@@ -1,16 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package com.zerolabs.testjavajunk;
 
-/**
- *
- * @author Infel Phira
- */
+import Locks.DeadLock;
+import Locks.LiveLock;
+import SecondTask.SecondTask;
+
 public class TestJavaJunk {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        //DeadLock dl = new DeadLock();
+        //dl.demonstrate();
+        
+        //LiveLock ll = new LiveLock();
+        //ll.demonstrate();
+        
+        SecondTask st = new SecondTask();
+        st.demonstrate();
     }
 }
