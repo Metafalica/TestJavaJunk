@@ -20,7 +20,7 @@ public class RunnableJunk implements Runnable {
     public void run() {
         long operationStartMs = System.currentTimeMillis();
         
-        while(!Thread.currentThread().isInterrupted() && System.currentTimeMillis() - operationStartMs <= this.liveMs) {
+        while(!Thread.currentThread().isInterrupted() && (liveMs == 0 || System.currentTimeMillis() - operationStartMs <= this.liveMs)) {
             if (RunnableJunk.lock.tryLock()) {
                 if(RunnableJunk.currValueToPrint.compareAndSet(this.valueToPrint, (this.valueToPrint & 1) + 1)) {
                     System.out.println(this.valueToPrint);

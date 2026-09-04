@@ -7,10 +7,10 @@ import SecondTask.SecondTask;
 public class TestJavaJunk {
 
     public static void main(String[] args) {
-        //DeadLock dl = new DeadLock();
+        DeadLock dl = new DeadLock();
         //dl.demonstrate();
         
-        //LiveLock ll = new LiveLock();
+        LiveLock ll = new LiveLock();
         //ll.demonstrate();
         
         SecondTask st = new SecondTask();
