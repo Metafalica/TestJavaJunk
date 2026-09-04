@@ -5,8 +5,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class RunnableJunk implements Runnable {
-    private static final Lock lock = new ReentrantLock(true);
-    private static final AtomicInteger currValueToPrint = new AtomicInteger(1);
+    private static final Lock LOCK = new ReentrantLock();
+    private static AtomicInteger currValueToPrint = new AtomicInteger(1);
     
     private long liveMs;
     private final int valueToPrint;
@@ -20,13 +20,19 @@ public class RunnableJunk implements Runnable {
     public void run() {
         long operationStartMs = System.currentTimeMillis();
         
-        while(!Thread.currentThread().isInterrupted() && (liveMs == 0 || System.currentTimeMillis() - operationStartMs <= this.liveMs)) {
-            if (RunnableJunk.lock.tryLock()) {
-                if(RunnableJunk.currValueToPrint.compareAndSet(this.valueToPrint, (this.valueToPrint & 1) + 1)) {
-                    System.out.println(this.valueToPrint);
+        while(!Thread.currentThread().isInterrupted() && (this.liveMs == 0 || System.currentTimeMillis() - operationStartMs <= this.liveMs)) {
+            if (RunnableJunk.LOCK.tryLock()) {
+                try {
+                    if(RunnableJunk.currValueToPrint.compareAndSet(this.valueToPrint, (this.valueToPrint & 1) + 1)) {
+                        System.out.println(this.valueToPrint);
+                    }
                 }
-                
-                RunnableJunk.lock.unlock();
+                catch(Exception exc) {
+                    System.out.println(exc.getMessage());
+                }
+                finally {
+                    RunnableJunk.LOCK.unlock();
+                }
             }
         }
     }    

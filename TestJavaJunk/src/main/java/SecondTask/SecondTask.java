@@ -10,4 +10,9 @@ public class SecondTask {
         thread2.start();
         thread1.start();
     }
+    
+    public static void main(String[] args) {
+        SecondTask st = new SecondTask();
+        st.demonstrate();
+    }
 }

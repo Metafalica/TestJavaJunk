@@ -1,56 +1,41 @@
 package Locks;
 
-import static java.lang.Thread.sleep;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
-public class DeadLock {
-    private Lock lock1;
-    private Lock lock2;
-    
-    public DeadLock() {
-        this.lock1 = new ReentrantLock(true);
-        this.lock2 = new ReentrantLock(true);
-    }
-    
-    public void demonstrate() {
-        new Thread(() -> { this.operation1(); }, "Th1").start();
-        new Thread(() -> { this.operation2(); }, "Th2").start();
-    }
-    
-    public void operation1() {
-        lock1.lock();
-        System.out.println("lock1 acquired, acquiring lock2...");
+public class DeadLock extends BaseLock {    
+    @Override
+    void lockAndExecute(Lock outerLock, Lock innerLock, Runnable actionOnOuterLock, Runnable actionOnInnerLock) {
+        System.out.println(Thread.currentThread().getName() + " --> Acquiring outer lock...");
+        outerLock.lock();
+                
         try {
-            sleep(50);
-        } catch (InterruptedException ex) {
-            System.out.println(DeadLock.class.getName() + " --> operation1 --> sleep(50) --> " + ex);
+            System.out.println(Thread.currentThread().getName() + " --> Executing action 1...");
+            actionOnOuterLock.run();
+            
+            System.out.println(Thread.currentThread().getName() + " --> Acquiring inner lock...");
+            innerLock.lock();
+            
+            try {
+                System.out.println(Thread.currentThread().getName() + " --> Executing action 2...");
+                actionOnInnerLock.run();
+            }
+            catch(Exception exc) {
+                System.out.println(exc.getMessage());
+            }
+            finally {
+                innerLock.unlock();
+            }
         }
-
-        lock2.lock();
-        System.out.println("lock2 acquired");
-
-        System.out.println("First operation done, releasing locks...");
-
-        lock2.unlock();
-        lock1.unlock();
-    }
-
-    public void operation2() {
-        lock2.lock();
-        System.out.println("lock2 acquired, acquiring lock1...");
-        try {
-            sleep(50);
-        } catch (InterruptedException ex) {
-            System.out.println(DeadLock.class.getName() + " --> operation2 --> sleep(50) --> " + ex);
+        catch (Exception exc) {
+            System.out.println(exc.getMessage());
         }
-
-        lock1.lock();
-        System.out.println("lock1 acquired");
-
-        System.out.println("Second operation done, releasing locks...");
-
-        lock1.unlock();
-        lock2.unlock();
+        finally {
+            outerLock.unlock();
+        }
     }
+    
+    public static void main(String[] args) {
+        DeadLock dl = new DeadLock();
+        dl.demonstrate();       
+    }   
 }
